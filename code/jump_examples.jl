@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.5
+# v0.18.0
 
 using Markdown
 using InteractiveUtils
@@ -208,10 +208,54 @@ begin
 	(_,mp1)=P1(wv0)
 	ovmp1=objective_value(mp1)
 	[tv0[1];1]'*inv(T)*[y1;y2] - ovmp1
+	
+end
+
+# ╔═╡ d6701da9-7503-41ca-91af-5ed2aa2d2632
+function mainloop(v, ϵ=0.05)
+	(xv,zv,mp2)=P2(v)
+	(wv,uv,md2)=D2(v)
+	if (zv<=ϵ)
+		return Dict("xv"=>xv, "message"=>"go next")
+	else
+		yv=v+zv*c
+		tv = T'*wv
+		(_,mp1)=P1(wv)
+		ovmp=objective_value(mp1)
+		return Dict(
+			"xv"=>xv,
+			"coef of y1"=> [tv[1];1]'*inv(T)[:,1],
+			"coef of y2"=> [tv[1];1]'*inv(T)[:,2],
+			"rhs" => ovmp
+		)
+	end
 end
 
 # ╔═╡ 867da65a-194c-49fc-b094-db6aba2fb1f8
+begin
+	k=1
+	v1 = [0.59;0]
+	v2 = [0;0.59]
+	# (xv1,zv1,mp21)=P2(v1)
+	# (wv1,uv1,md21)=D2(v1)
+	# yv1=v1+zv1*c
+	# tv1 = T'*wv1
+	# (_,mp11)=P1(wv1)
+	# ovmp2=objective_value(mp11)
+	# [tv1[1];1]'*inv(T)[:,1], [tv1[1];1]'*inv(T)[:,2], ovmp2
+	outcome = mainloop(v1)
+	k=2
+	A= [0.45,0.14]
+	B = [0.82,0]
+	C = [0;0.82]
+	D= [0.14,0.45]
+	outcome= mainloop(D)
+	
+end
 
+# ╔═╡ b9d73714-83d5-4498-96e7-9cf7d3a37d26
+begin 
+	v3=[0.45;0.14]
 
 # ╔═╡ 18d33034-3b9e-4a63-8680-97c840e5049d
 rng = MersenneTwister(1234);
@@ -237,7 +281,7 @@ SymPy = "~1.1.4"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.1"
+julia_version = "1.7.2"
 manifest_format = "2.0"
 
 [[deps.ASL_jll]]
@@ -1289,6 +1333,8 @@ version = "0.9.1+5"
 # ╠═e376960f-9c8f-475d-a86c-ec6d4f5a5428
 # ╠═b77e1831-9a8c-4e8c-a2f1-f9dfc4855617
 # ╠═867da65a-194c-49fc-b094-db6aba2fb1f8
+# ╠═d6701da9-7503-41ca-91af-5ed2aa2d2632
+# ╠═b9d73714-83d5-4498-96e7-9cf7d3a37d26
 # ╠═18d33034-3b9e-4a63-8680-97c840e5049d
 # ╠═ac6bf26c-87f2-11ec-2d44-132890b409ec
 # ╟─00000000-0000-0000-0000-000000000001
